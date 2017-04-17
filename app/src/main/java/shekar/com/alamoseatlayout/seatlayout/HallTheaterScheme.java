@@ -41,10 +41,14 @@ public class HallTheaterScheme {
     testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     testPaint.setStyle(Paint.Style.FILL);
     testPaint.setColor(Color.GREEN);
+    testPaint.setFilterBitmap(true);
+    testPaint.setDither(true);
     screenTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     screenTextPaint.setColor(Color.WHITE);
     screenTextPaint.setTextSize(DensityUtil.sip2px(mContext, 14f));
     screenTextPaint.setTypeface(Typeface.createFromAsset(mContext.getAssets(), "fonts/FuturaStd-Book.otf"));
+    screenTextPaint.setFilterBitmap(true);
+    screenTextPaint.setDither(true);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       screenTextPaint.setLetterSpacing(0.13f);
     }
@@ -59,11 +63,10 @@ public class HallTheaterScheme {
     int offset = (int) DensityUtil.dip2px(mContext, 8);
     int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
     int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
-    int height = bitmapHeight > measuredHeight ? bitmapHeight : measuredHeight;
-    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
+    Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
-    drawScreen(measuredWidth, tempCanvas);
+    drawScreen(bitmapWidth, tempCanvas);
 
     //Drawing Seats
     float left, right, top, bottom;
