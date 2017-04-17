@@ -1,9 +1,10 @@
-package shekar.com.alamoseatlayout;
+package shekar.com.alamoseatlayout.seatlayout;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import shekar.com.alamoseatlayout.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,13 +18,22 @@ public class MainActivity extends AppCompatActivity {
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
         imageView.getViewTreeObserver().removeOnPreDrawListener(this);
-        new HallTheaterScheme(imageView,imageView.getMeasuredWidth(),imageView.getMeasuredHeight());
+        new HallTheaterScheme(basicScheme(),imageView,imageView.getMeasuredWidth(),imageView.getMeasuredHeight());
         return true;
       }
     });
   }
 
-  @Override public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
+  public Seat[][] basicScheme() {
+    Seat seats[][] = new Seat[10][5];
+    for (int i = 0; i < 5; i++)
+      for(int j = 0; j < 5; j++) {
+        SeatExample seat = new SeatExample();
+        seat.id = i * 10 + (j+1);
+        seat.selectedSeatMarker = String.valueOf(j+1);
+        seat.status = HallTheaterScheme.SeatStatus.FREE;
+        seats[i][j] = seat;
+      }
+    return seats;
   }
 }
