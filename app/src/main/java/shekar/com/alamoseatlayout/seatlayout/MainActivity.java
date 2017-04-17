@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
       }
     });
     mPhotoView = (PhotoView) findViewById(R.id.imageView);
-    mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    //mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     ViewTreeObserver vto = mPhotoView.getViewTreeObserver();
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    Seat seats[][] = new Seat[10][10];
+    Seat seats[][] = new Seat[100][100];
     //for (int i = 0; i < 5; i++)
     //  for(int j = 0; j < 5; j++) {
     //    SeatExample seat = new SeatExample();

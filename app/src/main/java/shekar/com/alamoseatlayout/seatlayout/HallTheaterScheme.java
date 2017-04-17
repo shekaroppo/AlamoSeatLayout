@@ -36,6 +36,8 @@ public class HallTheaterScheme {
     screenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     screenPaint.setStyle(Paint.Style.FILL);
     screenPaint.setColor(Color.WHITE);
+    screenPaint.setFilterBitmap(true);
+    screenPaint.setDither(true);
     testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     testPaint.setStyle(Paint.Style.FILL);
     testPaint.setColor(Color.GREEN);
@@ -58,10 +60,10 @@ public class HallTheaterScheme {
     int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
     int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
     int height = bitmapHeight > measuredHeight ? bitmapHeight : measuredHeight;
-    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, height, Bitmap.Config.ARGB_8888);
+    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
-    //drawScreen(measuredWidth, tempCanvas);
+    drawScreen(measuredWidth, tempCanvas);
 
     //Drawing Seats
     float left, right, top, bottom;
@@ -69,13 +71,28 @@ public class HallTheaterScheme {
       for (int column = 0; column < columns; column++) {
         left = offset / 2 + (seatWidth + seatGap) * column;
         right = left + seatWidth;
-        top = offset / 2 + (seatWidth + seatGap) * row +screenOffset;
-        bottom = top + seatWidth+screenOffset;
+        top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
+        bottom = top + seatWidth;
         tempCanvas.drawRect(left, top, right, bottom, testPaint);
       }
     }
-
     return tempBitmap;
+    //return scaleBitmap(tempBitmap,0.5f);
+  }
+
+  public static Bitmap scaleBitmap(Bitmap src, float factor) {
+    int width = src.getWidth();
+    int height = src.getHeight();
+    int scaledWidth = (int) (width * factor);
+    int scaledHeight = (int) (height * factor);
+    Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    Bitmap scaled = Bitmap.createScaledBitmap(src, scaledWidth, scaledHeight, false);
+    Canvas canvas = new Canvas(bmp);
+    Paint paint = new Paint();
+    int distX = (width - scaledWidth) / 2;
+    int distY = (height - scaledHeight) / 2;
+    canvas.drawBitmap(scaled, distX, distY, paint);
+    return bmp;
   }
 
   private void drawScreen(int width, Canvas tempCanvas) {
