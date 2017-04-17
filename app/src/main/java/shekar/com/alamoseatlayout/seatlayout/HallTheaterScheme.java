@@ -19,10 +19,11 @@ public class HallTheaterScheme {
   private Paint testPaint;
   private Paint screenTextPaint;
   private String message;
+  private float screenOffset = 0;
 
-  public HallTheaterScheme(Seat[][] seats, ImageView imageView) {
+  public HallTheaterScheme(Seat[][] seats, ImageView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext());
-    imageView.setImageBitmap(getImageBitmap(seats));
+    imageView.setImageBitmap(getImageBitmap(seats, measuredWidth, measuredHeight));
   }
 
   private void init(Context context) {
@@ -47,31 +48,32 @@ public class HallTheaterScheme {
     }
   }
 
-  public Bitmap getImageBitmap(Seat[][] seats) {
+  public Bitmap getImageBitmap(Seat[][] seats, int measuredWidth, int measuredHeight) {
 
     int rows = seats.length;
     int columns = seats[0].length;
     int seatWidth = 30;
-    int seatGap = 1;
+    int seatGap = 5;
     int offset = (int) DensityUtil.dip2px(mContext, 8);
-    int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset ;
-    int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset ;
-    Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+    int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
+    int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
+    int height = bitmapHeight > measuredHeight ? bitmapHeight : measuredHeight;
+    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, height, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
-    drawScreen(bitmapWidth, tempCanvas);
+    //drawScreen(measuredWidth, tempCanvas);
 
     //Drawing Seats
-    //int left,right,top,bottom;
-    //for (int row = 0; row < rows; row++) {
-    //  for (int column = 0; column < columns; column++) {
-    //    left=offset / 2 + (seatWidth + seatGap) * column;
-    //    right= left + seatWidth;
-    //    top= offset / 2 + (seatWidth + seatGap) * row;
-    //    bottom=top+seatWidth;
-    //    tempCanvas.drawRect(left,top,right,bottom,testPaint);
-    //  }
-    //}
+    float left, right, top, bottom;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        left = offset / 2 + (seatWidth + seatGap) * column;
+        right = left + seatWidth;
+        top = offset / 2 + (seatWidth + seatGap) * row +screenOffset;
+        bottom = top + seatWidth+screenOffset;
+        tempCanvas.drawRect(left, top, right, bottom, testPaint);
+      }
+    }
 
     return tempBitmap;
   }
@@ -90,6 +92,7 @@ public class HallTheaterScheme {
     float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
     float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
     tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
+    screenOffset = screenRect.centerY() + textOffsetY;
   }
 
   public enum SeatStatus {
