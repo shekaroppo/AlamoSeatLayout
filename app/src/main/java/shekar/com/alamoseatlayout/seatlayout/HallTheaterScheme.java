@@ -52,7 +52,7 @@ public class HallTheaterScheme {
     int columns = seats[0].length;
     int seatWidth = 30;
     int seatGap = 1;
-    int offset = 10;
+    int offset = (int) DensityUtil.dip2px(mContext, 8);
     int left,right,top,bottom;
     int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset ;
     int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset ;
