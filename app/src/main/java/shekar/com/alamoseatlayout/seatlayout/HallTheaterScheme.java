@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.text.TextPaint;
@@ -19,9 +20,9 @@ public class HallTheaterScheme {
   private Paint screenTextPaint;
   private String message;
 
-  public HallTheaterScheme(Seat[][] seats, ImageView imageView, int measuredWidth, int measuredHeight) {
+  public HallTheaterScheme(Seat[][] seats, ImageView imageView) {
     init(imageView.getContext());
-    imageView.setImageBitmap(getImageBitmap(seats, measuredWidth, measuredHeight));
+    imageView.setImageBitmap(getImageBitmap(seats));
   }
 
   private void init(Context context) {
@@ -46,44 +47,49 @@ public class HallTheaterScheme {
     }
   }
 
-  public Bitmap getImageBitmap(Seat[][] seats, int width, int height) {
+  public Bitmap getImageBitmap(Seat[][] seats) {
 
     int rows = seats.length;
     int columns = seats[0].length;
     int seatWidth = 30;
     int seatGap = 1;
     int offset = (int) DensityUtil.dip2px(mContext, 8);
-    int left,right,top,bottom;
     int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset ;
     int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset ;
     Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
-    ////Drawing Screen
-    //float widthCenter = width / 2;
-    //float screenWidth = width * 6 / 7;
-    //float screenHeight = DensityUtil.dip2px(mContext, 10f);
-    //float left = widthCenter - screenWidth / 2;
-    //float top = DensityUtil.dip2px(mContext, 24f);
-    //RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
-    //tempCanvas.drawRoundRect(screenRect, DensityUtil.dip2px(mContext, screenHeight), DensityUtil.dip2px(mContext, screenHeight), screenPaint);
-    //screenRect.top = top + screenHeight / 2;
-    //tempCanvas.drawRect(screenRect, backgroundPaint);
-    //float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
-    //float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-    //tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
+    drawScreen(bitmapWidth, tempCanvas);
+
     //Drawing Seats
-    for (int row = 0; row < rows; row++) {
-      for (int column = 0; column < columns; column++) {
-        left=offset / 2 + (seatWidth + seatGap) * column;
-        right= left + seatWidth;
-        top= offset / 2 + (seatWidth + seatGap) * row;
-        bottom=top+seatWidth;
-        tempCanvas.drawRect(left,top,right,bottom,testPaint);
-      }
-    }
+    //int left,right,top,bottom;
+    //for (int row = 0; row < rows; row++) {
+    //  for (int column = 0; column < columns; column++) {
+    //    left=offset / 2 + (seatWidth + seatGap) * column;
+    //    right= left + seatWidth;
+    //    top= offset / 2 + (seatWidth + seatGap) * row;
+    //    bottom=top+seatWidth;
+    //    tempCanvas.drawRect(left,top,right,bottom,testPaint);
+    //  }
+    //}
 
     return tempBitmap;
+  }
+
+  private void drawScreen(int width, Canvas tempCanvas) {
+    //Drawing Screen
+    float widthCenter = width / 2;
+    float screenWidth = width * 6 / 7;
+    float screenHeight = DensityUtil.dip2px(mContext, 10f);
+    float left = widthCenter - screenWidth / 2;
+    float top = DensityUtil.dip2px(mContext, 24f);
+    RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
+    tempCanvas.drawRoundRect(screenRect, DensityUtil.dip2px(mContext, screenHeight), DensityUtil.dip2px(mContext, screenHeight), screenPaint);
+    screenRect.top = top + screenHeight / 2;
+    tempCanvas.drawRect(screenRect, backgroundPaint);
+    float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
+    float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
+    tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
   }
 
   public enum SeatStatus {

@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,14 +110,8 @@ public class MainActivity extends AppCompatActivity {
       }
     });
     mPhotoView = (PhotoView) findViewById(R.id.imageView);
-    ViewTreeObserver vto = mPhotoView.getViewTreeObserver();
-    vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-      public boolean onPreDraw() {
-        mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
-        new HallTheaterScheme(basicScheme(),mPhotoView,mPhotoView.getMeasuredWidth(),mPhotoView.getMeasuredHeight());
-        return true;
-      }
-    });
+    mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    new HallTheaterScheme(basicScheme(),mPhotoView);
     mCurrMatrixTv = (TextView) findViewById(R.id.tv_current_matrix);
 
     // Lets attach some listeners, not required though!
