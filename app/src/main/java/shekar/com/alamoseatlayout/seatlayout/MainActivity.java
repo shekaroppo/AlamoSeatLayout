@@ -111,7 +111,10 @@ public class MainActivity extends AppCompatActivity {
       }
     });
     mPhotoView = (PhotoView) findViewById(R.id.imageView);
-    mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+    //  mPhotoView.setLayerType(LAYER_TYPE_SOFTWARE, null);
+    //}
+    //mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     ViewTreeObserver vto = mPhotoView.getViewTreeObserver();
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
       }
     });
-    mCurrMatrixTv = (TextView) findViewById(R.id.tv_current_matrix);
+   // mCurrMatrixTv = (TextView) findViewById(R.id.tv_current_matrix);
 
     // Lets attach some listeners, not required though!
     mPhotoView.setOnMatrixChangeListener(new MatrixChangeListener());
@@ -152,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onMatrixChanged(RectF rect) {
-      mCurrMatrixTv.setText(rect.toString());
+      //mCurrMatrixTv.setText(rect.toString());
     }
   }
 

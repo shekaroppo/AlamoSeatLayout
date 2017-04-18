@@ -15,11 +15,9 @@ import shekar.com.alamoseatlayout.drawing.DensityUtil;
 public class HallTheaterScheme {
   Paint backgroundPaint;
   private Context mContext;
-  private Paint screenPaint;
   private Paint testPaint;
-  private Paint screenTextPaint;
-  private String message;
   private float screenOffset = 0;
+  private Scene scene;
 
   public HallTheaterScheme(Seat[][] seats, ImageView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext());
@@ -27,31 +25,15 @@ public class HallTheaterScheme {
   }
 
   private void init(Context context) {
-
     mContext = context;
-    message = "THE SCREEN";
     backgroundPaint = new Paint();
     backgroundPaint.setStyle(Paint.Style.FILL);
     backgroundPaint.setColor(Color.BLACK);
-    screenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    screenPaint.setStyle(Paint.Style.FILL);
-    screenPaint.setColor(Color.WHITE);
-    screenPaint.setFilterBitmap(true);
-    screenPaint.setDither(true);
     testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     testPaint.setStyle(Paint.Style.FILL);
     testPaint.setColor(Color.GREEN);
     testPaint.setFilterBitmap(true);
     testPaint.setDither(true);
-    screenTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    screenTextPaint.setColor(Color.WHITE);
-    screenTextPaint.setTextSize(DensityUtil.sip2px(mContext, 14f));
-    screenTextPaint.setTypeface(Typeface.createFromAsset(mContext.getAssets(), "fonts/FuturaStd-Book.otf"));
-    screenTextPaint.setFilterBitmap(true);
-    screenTextPaint.setDither(true);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      screenTextPaint.setLetterSpacing(0.13f);
-    }
   }
 
   public Bitmap getImageBitmap(Seat[][] seats, int measuredWidth, int measuredHeight) {
@@ -61,24 +43,28 @@ public class HallTheaterScheme {
     int seatWidth = 30;
     int seatGap = 5;
     int offset = (int) DensityUtil.dip2px(mContext, 8);
-    int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
-    int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
-    Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+   // int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
+    //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
+    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
-    drawScreen(bitmapWidth, tempCanvas);
+    //drawScreen(bitmapWidth, tempCanvas);
+    scene=new Scene(measuredWidth,mContext,backgroundPaint);
+    scene.drawScreen(tempCanvas);
+
+
 
     //Drawing Seats
-    float left, right, top, bottom;
-    for (int row = 0; row < rows; row++) {
-      for (int column = 0; column < columns; column++) {
-        left = offset / 2 + (seatWidth + seatGap) * column;
-        right = left + seatWidth;
-        top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
-        bottom = top + seatWidth;
-        tempCanvas.drawRect(left, top, right, bottom, testPaint);
-      }
-    }
+    //float left, right, top, bottom;
+    //for (int row = 0; row < rows; row++) {
+    //  for (int column = 0; column < columns; column++) {
+    //    left = offset / 2 + (seatWidth + seatGap) * column;
+    //    right = left + seatWidth;
+    //    top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
+    //    bottom = top + seatWidth;
+    //    tempCanvas.drawRect(left, top, right, bottom, testPaint);
+    //  }
+    //}
     return tempBitmap;
     //return scaleBitmap(tempBitmap,0.5f);
   }
@@ -100,19 +86,19 @@ public class HallTheaterScheme {
 
   private void drawScreen(int width, Canvas tempCanvas) {
     //Drawing Screen
-    float widthCenter = width / 2;
-    float screenWidth = width * 6 / 7;
-    float screenHeight = DensityUtil.dip2px(mContext, 10f);
-    float left = widthCenter - screenWidth / 2;
-    float top = DensityUtil.dip2px(mContext, 24f);
-    RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
-    tempCanvas.drawRoundRect(screenRect, DensityUtil.dip2px(mContext, screenHeight), DensityUtil.dip2px(mContext, screenHeight), screenPaint);
-    screenRect.top = top + screenHeight / 2;
-    tempCanvas.drawRect(screenRect, backgroundPaint);
-    float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
-    float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-    tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
-    screenOffset = screenRect.centerY() + textOffsetY;
+    //float widthCenter = width / 2;
+    //float screenWidth = width * 6 / 7;
+    //float screenHeight = DensityUtil.dip2px(mContext, 10);
+    //float left = widthCenter - screenWidth / 2;
+    //float top = DensityUtil.dip2px(mContext, 24);
+    //RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
+    //tempCanvas.drawRoundRect(screenRect, DensityUtil.dip2px(mContext, screenHeight), DensityUtil.dip2px(mContext, screenHeight), screenPaint);
+    //screenRect.top = top + screenHeight / 2;
+    //tempCanvas.drawRect(screenRect, backgroundPaint);
+    //float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
+    //float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
+    //tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
+    //screenOffset = screenRect.centerY() + textOffsetY;
   }
 
   public enum SeatStatus {
@@ -128,5 +114,112 @@ public class HallTheaterScheme {
       return this;
     }
 
+  }
+
+  public static class Scene {
+
+    public float screenWidth, screenHeight, left,top,cornerRadius;
+    private Paint screenPaint;
+    private Paint screenTextPaint;
+    private String message;
+    private Paint backgroundPaint;
+
+    Scene(float totalWidth, Context context, Paint backgroundPaint) {
+      screenHeight =  DensityUtil.dip2px(context, 10);
+      float widthCenter = totalWidth / 2;
+      screenWidth = totalWidth * 6 / 7;
+      left = widthCenter - screenWidth / 2;
+      top = DensityUtil.dip2px(context, 24);
+      cornerRadius=DensityUtil.dip2px(context, screenHeight);
+
+      screenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+      screenPaint.setStyle(Paint.Style.FILL);
+      screenPaint.setColor(Color.WHITE);
+      screenPaint.setFilterBitmap(true);
+      screenPaint.setDither(true);
+
+      screenTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+      screenTextPaint.setColor(Color.WHITE);
+      screenTextPaint.setTextSize(DensityUtil.sip2px(context, 14f));
+      screenTextPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/FuturaStd-Book.otf"));
+      screenTextPaint.setFilterBitmap(true);
+      screenTextPaint.setDither(true);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        screenTextPaint.setLetterSpacing(0.13f);
+      }
+      this.backgroundPaint=backgroundPaint;
+      message = "THE SCREEN";
+    }
+
+     void drawScreen(Canvas canvas){
+      RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
+      canvas.drawRoundRect(screenRect, cornerRadius,cornerRadius, screenPaint);
+      screenRect.top = top + screenHeight / 2;
+      canvas.drawRect(screenRect, backgroundPaint);
+      float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
+      float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
+      canvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
+    }
+    //
+    //public void setScenePosition(ScenePosition position, int offset) {
+    //  this.position = position;
+    //  this.offset = offset;
+    //  dimension = 90;
+    //  switch (position) {
+    //    case NORTH:
+    //      dimensionSecond = width * 12;
+    //      break;
+    //    case SOUTH:
+    //      dimensionSecond = width * 12;
+    //      break;
+    //    case EAST:
+    //      dimensionSecond = height * 12;
+    //      break;
+    //    case WEST:
+    //      dimensionSecond = height * 12;
+    //      break;
+    //    case NONE:
+    //      dimensionSecond = 0;
+    //      dimension = 0;
+    //      break;
+    //    default:
+    //      dimensionSecond = 0;
+    //      dimension = 0;
+    //      this.position = ScenePosition.NONE;
+    //      break;
+    //  }
+    //}
+
+    //public int getTopXOffset() {
+    //  if (position == ScenePosition.NORTH) {
+    //    return dimension + offset;
+    //  }
+    //  return 0;
+    //}
+    //
+    //public int getLeftYOffset() {
+    //  if (position == ScenePosition.EAST) {
+    //    return dimension + offset;
+    //  }
+    //  return 0;
+    //}
+    //
+    //public int getBottomXOffset() {
+    //  if (position == ScenePosition.SOUTH) {
+    //    return dimension + offset;
+    //  }
+    //  return 0;
+    //}
+    //
+    //public int getRightYOffset() {
+    //  if (position == ScenePosition.WEST) {
+    //    return dimension + offset;
+    //  }
+    //  return 0;
+    //}
+
+    //@Override public String toString() {
+    //  return String.format("Left - %d, Right- %d, Top - %d, Bottom - %d", getLeftYOffset(), getRightYOffset(), getTopXOffset(), getBottomXOffset());
+    //}
   }
 }

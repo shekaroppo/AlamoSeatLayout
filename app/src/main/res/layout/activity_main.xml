@@ -13,20 +13,11 @@
 
   <ImageView
       android:layout_width="match_parent"
-      android:layout_height="200dp"
+      android:layout_height="100dp"
       android:background="#e34"
       />
   <shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView
       android:id="@+id/imageView"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
-  <TextView
-      android:id="@+id/tv_current_matrix"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="bottom|center_horizontal"
-      android:background="#60000000"
-      android:gravity="center"
-      android:textColor="@android:color/white" />
-
 </LinearLayout>
