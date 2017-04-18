@@ -39,19 +39,17 @@ public class HallTheaterScheme {
 
     int rows = seats.length;
     int columns = seats[0].length;
-    int seatWidth = 30;
     int seatGap = 5;
     int offset = (int) DensityUtil.dip2px(mContext, 8);
-   // int bitmapHeight = rows * (seatWidth + seatGap) - seatGap + offset;
+    float seatWidth = (measuredWidth/columns)-seatGap;
+    scene=new Scene(measuredWidth,mContext,backgroundPaint);
+    int bitmapHeight = (int) (rows * (seatWidth + seatGap)  + offset+scene.baseLine);
     //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
-    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
+    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     tempCanvas.drawPaint(backgroundPaint);
     //drawScreen(bitmapWidth, tempCanvas);
-    scene=new Scene(measuredWidth,mContext,backgroundPaint);
     scene.drawScreen(tempCanvas);
-
-
 
     //Drawing Seats
     float left, right, top, bottom;
@@ -118,7 +116,7 @@ public class HallTheaterScheme {
 
   public static class Scene {
 
-    public float screenWidth, screenHeight, left,top,cornerRadius, baseLine;
+    public float screenWidth, screenHeight, left,top,cornerRadius, baseLine,textOffsetX,textOffsetY;
     private Paint screenPaint;
     private Paint screenTextPaint;
     private String message;
@@ -149,6 +147,9 @@ public class HallTheaterScheme {
       }
       this.backgroundPaint=backgroundPaint;
       message = "THE SCREEN";
+      textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
+      textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
+      baseLine =top + screenHeight + textOffsetY;
     }
 
      void drawScreen(Canvas canvas){
@@ -156,9 +157,6 @@ public class HallTheaterScheme {
       canvas.drawRoundRect(screenRect, cornerRadius,cornerRadius, screenPaint);
       screenRect.top = top + screenHeight / 2;
       canvas.drawRect(screenRect, backgroundPaint);
-      float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
-      float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-       baseLine =screenRect.centerY() + textOffsetY;
       canvas.drawText(message, screenRect.centerX() - textOffsetX, baseLine, screenTextPaint);
     }
     //
