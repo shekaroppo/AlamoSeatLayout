@@ -16,7 +16,6 @@ public class HallTheaterScheme {
   Paint backgroundPaint;
   private Context mContext;
   private Paint testPaint;
-  private float screenOffset = 0;
   private Scene scene;
 
   public HallTheaterScheme(Seat[][] seats, ImageView imageView, int measuredWidth, int measuredHeight) {
@@ -56,11 +55,12 @@ public class HallTheaterScheme {
 
     //Drawing Seats
     float left, right, top, bottom;
+    float topOffset=scene.baseLine+(int) DensityUtil.dip2px(mContext, 8);
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
         left = offset / 2 + (seatWidth + seatGap) * column;
         right = left + seatWidth;
-        top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
+        top = offset / 2 + (seatWidth + seatGap) * row +topOffset;
         bottom = top + seatWidth;
         tempCanvas.drawRect(left, top, right, bottom, testPaint);
       }
@@ -118,7 +118,7 @@ public class HallTheaterScheme {
 
   public static class Scene {
 
-    public float screenWidth, screenHeight, left,top,cornerRadius;
+    public float screenWidth, screenHeight, left,top,cornerRadius, baseLine;
     private Paint screenPaint;
     private Paint screenTextPaint;
     private String message;
@@ -158,7 +158,8 @@ public class HallTheaterScheme {
       canvas.drawRect(screenRect, backgroundPaint);
       float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
       float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-      canvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
+       baseLine =screenRect.centerY() + textOffsetY;
+      canvas.drawText(message, screenRect.centerX() - textOffsetX, baseLine, screenTextPaint);
     }
     //
     //public void setScenePosition(ScenePosition position, int offset) {
