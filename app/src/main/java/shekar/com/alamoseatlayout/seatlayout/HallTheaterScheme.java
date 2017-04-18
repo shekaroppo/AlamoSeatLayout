@@ -55,16 +55,16 @@ public class HallTheaterScheme {
 
 
     //Drawing Seats
-    //float left, right, top, bottom;
-    //for (int row = 0; row < rows; row++) {
-    //  for (int column = 0; column < columns; column++) {
-    //    left = offset / 2 + (seatWidth + seatGap) * column;
-    //    right = left + seatWidth;
-    //    top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
-    //    bottom = top + seatWidth;
-    //    tempCanvas.drawRect(left, top, right, bottom, testPaint);
-    //  }
-    //}
+    float left, right, top, bottom;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        left = offset / 2 + (seatWidth + seatGap) * column;
+        right = left + seatWidth;
+        top = offset / 2 + (seatWidth + seatGap) * row+screenOffset ;
+        bottom = top + seatWidth;
+        tempCanvas.drawRect(left, top, right, bottom, testPaint);
+      }
+    }
     return tempBitmap;
     //return scaleBitmap(tempBitmap,0.5f);
   }
