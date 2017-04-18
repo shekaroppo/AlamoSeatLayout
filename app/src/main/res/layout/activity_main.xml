@@ -14,7 +14,7 @@
   <ImageView
       android:layout_width="match_parent"
       android:layout_height="100dp"
-      android:background="#e34"
+      android:background="#555"
       />
   <shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView
       android:id="@+id/imageView"

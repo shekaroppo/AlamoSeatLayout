@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
     //  mPhotoView.setLayerType(LAYER_TYPE_SOFTWARE, null);
     //}
-    //mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     ViewTreeObserver vto = mPhotoView.getViewTreeObserver();
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    Seat seats[][] = new Seat[21][21];
+    Seat seats[][] = new Seat[20][20];
     //for (int i = 0; i < 5; i++)
     //  for(int j = 0; j < 5; j++) {
     //    SeatExample seat = new SeatExample();

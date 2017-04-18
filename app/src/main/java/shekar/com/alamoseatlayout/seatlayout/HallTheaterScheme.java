@@ -23,50 +23,6 @@ public class HallTheaterScheme {
     imageView.setImageBitmap(getImageBitmap(seats, measuredWidth, measuredHeight));
   }
 
-  private void init(Context context) {
-    mContext = context;
-    backgroundPaint = new Paint();
-    backgroundPaint.setStyle(Paint.Style.FILL);
-    backgroundPaint.setColor(Color.BLACK);
-    testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    testPaint.setStyle(Paint.Style.FILL);
-    testPaint.setColor(Color.GREEN);
-    testPaint.setFilterBitmap(true);
-    testPaint.setDither(true);
-  }
-
-  public Bitmap getImageBitmap(Seat[][] seats, int measuredWidth, int measuredHeight) {
-
-    int rows = seats.length;
-    int columns = seats[0].length;
-    int seatGap = 5;
-    int offset = (int) DensityUtil.dip2px(mContext, 8);
-    float seatWidth = (measuredWidth/columns)-seatGap;
-    scene=new Scene(measuredWidth,mContext,backgroundPaint);
-    int bitmapHeight = (int) (rows * (seatWidth + seatGap)  + offset+scene.baseLine);
-    //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
-    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
-    Canvas tempCanvas = new Canvas(tempBitmap);
-    tempCanvas.drawPaint(backgroundPaint);
-    //drawScreen(bitmapWidth, tempCanvas);
-    scene.drawScreen(tempCanvas);
-
-    //Drawing Seats
-    float left, right, top, bottom;
-    float topOffset=scene.baseLine+(int) DensityUtil.dip2px(mContext, 8);
-    for (int row = 0; row < rows; row++) {
-      for (int column = 0; column < columns; column++) {
-        left = offset / 2 + (seatWidth + seatGap) * column;
-        right = left + seatWidth;
-        top = offset / 2 + (seatWidth + seatGap) * row +topOffset;
-        bottom = top + seatWidth;
-        tempCanvas.drawRect(left, top, right, bottom, testPaint);
-      }
-    }
-    return tempBitmap;
-    //return scaleBitmap(tempBitmap,0.5f);
-  }
-
   public static Bitmap scaleBitmap(Bitmap src, float factor) {
     int width = src.getWidth();
     int height = src.getHeight();
@@ -80,6 +36,65 @@ public class HallTheaterScheme {
     int distY = (height - scaledHeight) / 2;
     canvas.drawBitmap(scaled, distX, distY, paint);
     return bmp;
+  }
+
+  private void init(Context context) {
+    mContext = context;
+    backgroundPaint = new Paint();
+    backgroundPaint.setStyle(Paint.Style.FILL);
+    backgroundPaint.setColor(Color.RED);
+    testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    testPaint.setStyle(Paint.Style.FILL);
+    testPaint.setColor(Color.GREEN);
+    testPaint.setFilterBitmap(true);
+    testPaint.setDither(true);
+  }
+
+  public Bitmap getImageBitmap(Seat[][] seats, int measuredWidth, int measuredHeight) {
+    scene = new Scene(measuredWidth, mContext, backgroundPaint);
+
+    int rows = seats.length;
+    int columns = seats[0].length;
+    int seatGap = 5;
+    int offsetX=12 ;
+    int offsetY=12 ;
+    int minSeatWidth = 30;
+    float seatWidth;
+    int bitmapHeight;
+    float computedSeatWidth = (measuredWidth / columns) - seatGap;
+    float topOffset = scene.baseLine + (int) DensityUtil.dip2px(mContext, 8);
+
+    if (computedSeatWidth > minSeatWidth) {
+      seatWidth = minSeatWidth;
+      bitmapHeight = measuredHeight+offsetY;
+      offsetX= (int) (measuredWidth-((seatWidth+seatGap)*columns));
+    } else {
+      seatWidth = computedSeatWidth;
+      bitmapHeight = (int) (rows * (seatWidth + seatGap) +offsetY + topOffset);
+    }
+
+
+
+    //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
+    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+    Canvas tempCanvas = new Canvas(tempBitmap);
+    tempCanvas.drawPaint(backgroundPaint);
+    //drawScreen(bitmapWidth, tempCanvas);
+    scene.drawScreen(tempCanvas);
+
+    //Drawing Seats
+    float left, right, top, bottom;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        left = offsetX / 2 + (seatWidth + seatGap) * column;
+        right = left + seatWidth;
+        top = offsetY / 2 + (seatWidth + seatGap) * row + topOffset;
+        bottom = top + seatWidth;
+        tempCanvas.drawRect(left, top, right, bottom, testPaint);
+      }
+    }
+    return tempBitmap;
+    //return scaleBitmap(tempBitmap,0.5f);
   }
 
   private void drawScreen(int width, Canvas tempCanvas) {
@@ -116,19 +131,19 @@ public class HallTheaterScheme {
 
   public static class Scene {
 
-    public float screenWidth, screenHeight, left,top,cornerRadius, baseLine,textOffsetX,textOffsetY;
+    public float screenWidth, screenHeight, left, top, cornerRadius, baseLine, textOffsetX, textOffsetY;
     private Paint screenPaint;
     private Paint screenTextPaint;
     private String message;
     private Paint backgroundPaint;
 
     Scene(float totalWidth, Context context, Paint backgroundPaint) {
-      screenHeight =  DensityUtil.dip2px(context, 10);
+      screenHeight = DensityUtil.dip2px(context, 10);
       float widthCenter = totalWidth / 2;
       screenWidth = totalWidth * 6 / 7;
       left = widthCenter - screenWidth / 2;
       top = DensityUtil.dip2px(context, 24);
-      cornerRadius=DensityUtil.dip2px(context, screenHeight);
+      cornerRadius = DensityUtil.dip2px(context, screenHeight);
 
       screenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
       screenPaint.setStyle(Paint.Style.FILL);
@@ -145,16 +160,16 @@ public class HallTheaterScheme {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         screenTextPaint.setLetterSpacing(0.13f);
       }
-      this.backgroundPaint=backgroundPaint;
+      this.backgroundPaint = backgroundPaint;
       message = "THE SCREEN";
       textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
       textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-      baseLine =top + screenHeight + textOffsetY;
+      baseLine = top + screenHeight + textOffsetY;
     }
 
-     void drawScreen(Canvas canvas){
+    void drawScreen(Canvas canvas) {
       RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
-      canvas.drawRoundRect(screenRect, cornerRadius,cornerRadius, screenPaint);
+      canvas.drawRoundRect(screenRect, cornerRadius, cornerRadius, screenPaint);
       screenRect.top = top + screenHeight / 2;
       canvas.drawRect(screenRect, backgroundPaint);
       canvas.drawText(message, screenRect.centerX() - textOffsetX, baseLine, screenTextPaint);
