@@ -10,17 +10,33 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.text.TextPaint;
 import android.widget.ImageView;
+import android.widget.Toast;
 import shekar.com.alamoseatlayout.drawing.DensityUtil;
+import shekar.com.alamoseatlayout.seatlayout.photoview.OnPhotoTapListener;
+import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
+
+import static shekar.com.alamoseatlayout.seatlayout.MainActivity.PHOTO_TAP_TOAST_STRING;
 
 public class HallTheaterScheme {
   Paint backgroundPaint;
+  int seatGap = 5;
+  int offsetX = 12;
+  int offsetY = 12;
+  int minSeatWidth = 30;
+  float seatWidth;
+  int bitmapHeight;
+  int bitmapWidth;
   private Context mContext;
   private Paint testPaint;
-  private Scene scene;
+  private Screen screen;
+  private Seat[][] seats;
+  private int rows;
+  private int columns;
 
-  public HallTheaterScheme(Seat[][] seats, ImageView imageView, int measuredWidth, int measuredHeight) {
-    init(imageView.getContext());
-    imageView.setImageBitmap(getImageBitmap(seats, measuredWidth, measuredHeight));
+  public HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
+    init(imageView.getContext(), seats);
+    imageView.setOnPhotoTapListener(new PhotoTapListener());
+    imageView.setImageBitmap(getImageBitmap(measuredWidth, measuredHeight));
   }
 
   public static Bitmap scaleBitmap(Bitmap src, float factor) {
@@ -38,7 +54,27 @@ public class HallTheaterScheme {
     return bmp;
   }
 
-  private void init(Context context) {
+  private void clickScheme(float xPos, float yPos) {
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        if (seats[row][column].canSeatPress(xPos, yPos)) {
+          Toast.makeText(mContext,seats[row][column].id()+" Clicked",Toast.LENGTH_LONG).show();
+        }
+      }
+    }
+  }
+
+  //public boolean canSeatPress(Point p, int row, int seat) {
+  //  if (row >= width || (p.x % (seatWidth + seatGap) >= seatWidth) || p.x <= 0) {
+  //    return false;
+  //  }
+  //  if (seat >= height || (p.y % (seatWidth + seatGap) >= seatWidth) || p.y <= 0) {
+  //    return false;
+  //  }
+  //  return SeatStatus.canSeatBePressed(seats[seat][row].status());
+  //}
+
+  private void init(Context context, Seat[][] seats) {
     mContext = context;
     backgroundPaint = new Paint();
     backgroundPaint.setStyle(Paint.Style.FILL);
@@ -48,39 +84,30 @@ public class HallTheaterScheme {
     testPaint.setColor(Color.GREEN);
     testPaint.setFilterBitmap(true);
     testPaint.setDither(true);
+    this.seats = seats;
+    rows = seats.length;
+    columns = seats[0].length;
   }
 
-  public Bitmap getImageBitmap(Seat[][] seats, int measuredWidth, int measuredHeight) {
-    scene = new Scene(measuredWidth, mContext, backgroundPaint);
-
-    int rows = seats.length;
-    int columns = seats[0].length;
-    int seatGap = 5;
-    int offsetX=12 ;
-    int offsetY=12 ;
-    int minSeatWidth = 30;
-    float seatWidth;
-    int bitmapHeight;
+  public Bitmap getImageBitmap(int measuredWidth, int measuredHeight) {
+    screen = new Screen(measuredWidth, mContext, backgroundPaint);
     float computedSeatWidth = (measuredWidth / columns) - seatGap;
-    float topOffset = scene.baseLine + (int) DensityUtil.dip2px(mContext, 8);
-
+    float topOffset = screen.baseLine + (int) DensityUtil.dip2px(mContext, 8);
     if (computedSeatWidth > minSeatWidth) {
       seatWidth = minSeatWidth;
-      offsetX= (int) (measuredWidth-((seatWidth+seatGap)*columns));
-      bitmapHeight = (int) (measuredHeight+scene.baseLine);
+      offsetX = (int) (measuredWidth - ((seatWidth + seatGap) * columns));
+      bitmapHeight = (int) (measuredHeight + screen.baseLine);
     } else {
       seatWidth = computedSeatWidth;
-      bitmapHeight = (int) (rows * (seatWidth + seatGap) +offsetY + topOffset);
+      bitmapHeight = (int) (rows * (seatWidth + seatGap) + offsetY + topOffset);
     }
-
-
-
+    bitmapWidth = measuredWidth;
     //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
-    Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+    Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     //tempCanvas.drawPaint(backgroundPaint);
     //drawScreen(bitmapWidth, tempCanvas);
-    scene.drawScreen(tempCanvas);
+    screen.drawScreen(tempCanvas);
 
     //Drawing Seats
     float left, right, top, bottom;
@@ -90,11 +117,14 @@ public class HallTheaterScheme {
         right = left + seatWidth;
         top = offsetY / 2 + (seatWidth + seatGap) * row + topOffset;
         bottom = top + seatWidth;
-        tempCanvas.drawRect(left, top, right, bottom, testPaint);
+        System.out.println(
+            String.format("======R %d | C %d = Left: %f , Right %f, Top %f , Bottom %f ", row, column, left, right, top, bottom) + "======");
+        SeatExample seat = ((SeatExample) seats[row][column]);
+        seat.bounds = new RectF(left, top, right, bottom);
+        tempCanvas.drawRect(seat.bounds, testPaint);
       }
     }
     return tempBitmap;
-    //return scaleBitmap(tempBitmap,0.5f);
   }
 
   private void drawScreen(int width, Canvas tempCanvas) {
@@ -115,21 +145,28 @@ public class HallTheaterScheme {
   }
 
   public enum SeatStatus {
-    FREE, BUSY, EMPTY, CHOSEN, INFO;
+    NONE, EMPTY, SOLD, RESERVED, BROKEN, PLACEHOLDER, UNKNOWN, BUSY, CHOSEN, INFO;
 
     public static boolean canSeatBePressed(SeatStatus status) {
-      return (status == FREE || status == CHOSEN);
+      return (status == EMPTY || status == CHOSEN);
     }
 
     public SeatStatus pressSeat() {
-      if (this == FREE) return CHOSEN;
-      if (this == CHOSEN) return FREE;
+      if (this == EMPTY) return CHOSEN;
+      if (this == CHOSEN) return EMPTY;
       return this;
     }
-
   }
 
-  public static class Scene {
+  public enum SeatStyle {
+    NONE, NORMAL, BARSEAT, HANDICAP, COMPANION, UNKNOWN
+  }
+
+  public enum TableStyle {
+    NONE, SINGLE, PAIR_LEFT, PAIR_RIGHT, SIDE_TABLE_LEFT, SIDE_TABLE_RIGHT, LONG_LEFT, LONG_CENTER, LONG_RIGHT, LONG_GAP, LONG_GAP_LEFT, LONG_GAP_RIGHT, UNKNOWN
+  }
+
+  public static class Screen {
 
     public float screenWidth, screenHeight, left, top, cornerRadius, baseLine, textOffsetX, textOffsetY;
     private Paint screenPaint;
@@ -137,7 +174,7 @@ public class HallTheaterScheme {
     private String message;
     private Paint backgroundPaint;
 
-    Scene(float totalWidth, Context context, Paint backgroundPaint) {
+    Screen(float totalWidth, Context context, Paint backgroundPaint) {
       screenHeight = DensityUtil.dip2px(context, 10);
       float widthCenter = totalWidth / 2;
       screenWidth = totalWidth * 6 / 7;
@@ -235,5 +272,15 @@ public class HallTheaterScheme {
     //@Override public String toString() {
     //  return String.format("Left - %d, Right- %d, Top - %d, Bottom - %d", getLeftYOffset(), getRightYOffset(), getTopXOffset(), getBottomXOffset());
     //}
+  }
+
+  private class PhotoTapListener implements OnPhotoTapListener {
+
+    @Override public void onPhotoTap(ImageView view, float x, float y) {
+      float xPos = (float) Math.floor(x * bitmapWidth);
+      float yPos = (float) Math.floor(y * bitmapHeight);
+      clickScheme(xPos, yPos);
+      Toast.makeText(mContext, (String.format(PHOTO_TAP_TOAST_STRING, xPos, yPos, view == null ? 0 : view.getId())), Toast.LENGTH_SHORT).show();
+    }
   }
 }

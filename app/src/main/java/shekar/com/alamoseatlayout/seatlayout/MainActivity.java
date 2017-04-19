@@ -16,7 +16,6 @@ import android.widget.Toast;
 import java.util.Random;
 import shekar.com.alamoseatlayout.R;
 import shekar.com.alamoseatlayout.seatlayout.photoview.OnMatrixChangedListener;
-import shekar.com.alamoseatlayout.seatlayout.photoview.OnPhotoTapListener;
 import shekar.com.alamoseatlayout.seatlayout.photoview.OnSingleFlingListener;
 import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
 
@@ -127,19 +126,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Lets attach some listeners, not required though!
     mPhotoView.setOnMatrixChangeListener(new MatrixChangeListener());
-    mPhotoView.setOnPhotoTapListener(new PhotoTapListener());
+
     mPhotoView.setOnSingleFlingListener(new SingleFlingListener());
-  }
-
-  private class PhotoTapListener implements OnPhotoTapListener {
-
-    @Override
-    public void onPhotoTap(ImageView view, float x, float y) {
-      float xPercentage = x * 100f;
-      float yPercentage = y * 100f;
-
-      showToast(String.format(PHOTO_TAP_TOAST_STRING, xPercentage, yPercentage, view == null ? 0 : view.getId()));
-    }
   }
 
   private void showToast(CharSequence text) {
@@ -169,15 +157,19 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    Seat seats[][] = new Seat[19][19];
-    //for (int i = 0; i < 5; i++)
-    //  for(int j = 0; j < 5; j++) {
-    //    SeatExample seat = new SeatExample();
-    //    seat.id = i * 10 + (j+1);
-    //    seat.selectedSeatMarker = String.valueOf(j+1);
-    //    seat.status = HallTheaterScheme.SeatStatus.FREE;
-    //    seats[i][j] = seat;
-    //  }
+    int rows=2;
+    int columns=2;
+    Seat seats[][] = new Seat[rows][columns];
+    for (int i = 0; i < rows; i++)
+      for(int j = 0; j < columns; j++) {
+        SeatExample seat = new SeatExample();
+        seat.id = i * rows + (j + 1);
+        seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
+        seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
+        seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
+        seat.selectedSeatMarker = String.valueOf(j+1);
+        seats[i][j] = seat;
+      }
     return seats;
   }
 }
