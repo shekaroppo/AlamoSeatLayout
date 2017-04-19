@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    Seat seats[][] = new Seat[20][20];
+    Seat seats[][] = new Seat[19][19];
     //for (int i = 0; i < 5; i++)
     //  for(int j = 0; j < 5; j++) {
     //    SeatExample seat = new SeatExample();

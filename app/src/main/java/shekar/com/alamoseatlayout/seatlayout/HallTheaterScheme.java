@@ -42,7 +42,7 @@ public class HallTheaterScheme {
     mContext = context;
     backgroundPaint = new Paint();
     backgroundPaint.setStyle(Paint.Style.FILL);
-    backgroundPaint.setColor(Color.RED);
+    backgroundPaint.setColor(Color.BLACK);
     testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     testPaint.setStyle(Paint.Style.FILL);
     testPaint.setColor(Color.GREEN);
@@ -66,8 +66,8 @@ public class HallTheaterScheme {
 
     if (computedSeatWidth > minSeatWidth) {
       seatWidth = minSeatWidth;
-      bitmapHeight = measuredHeight+offsetY;
       offsetX= (int) (measuredWidth-((seatWidth+seatGap)*columns));
+      bitmapHeight = (int) (measuredHeight+scene.baseLine);
     } else {
       seatWidth = computedSeatWidth;
       bitmapHeight = (int) (rows * (seatWidth + seatGap) +offsetY + topOffset);
@@ -78,7 +78,7 @@ public class HallTheaterScheme {
     //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
     Bitmap tempBitmap = Bitmap.createBitmap(measuredWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
-    tempCanvas.drawPaint(backgroundPaint);
+    //tempCanvas.drawPaint(backgroundPaint);
     //drawScreen(bitmapWidth, tempCanvas);
     scene.drawScreen(tempCanvas);
 
