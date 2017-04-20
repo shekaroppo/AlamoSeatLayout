@@ -43,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
     zoomButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         if (zoomButton.getTag().equals("ZoomedOut")) {
-          mPhotoView.setScale(PhotoViewAttacher.DEFAULT_MID_SCALE, true);
-          zoomButton.setTag("ZoomedIn");
-          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_angel));
-        } else if (zoomButton.getTag().equals("ZoomedIn")) {
           mPhotoView.setScale(PhotoViewAttacher.DEFAULT_MIN_SCALE, true);
+          zoomButton.setTag("ZoomedIn");
+          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomin));
+        } else if (zoomButton.getTag().equals("ZoomedIn")) {
+          mPhotoView.setScale(PhotoViewAttacher.DEFAULT_MID_SCALE, true);
           zoomButton.setTag("ZoomedOut");
-          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_cool));
+          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomout));
         }
       }
     });
@@ -176,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override public void onMatrixChanged(RectF rect) {
       if (mPhotoView.getScale()==PhotoViewAttacher.DEFAULT_MIN_SCALE) {
-        zoomButton.setTag("ZoomedOut");
-        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_cool));
-      } else if (mPhotoView.getScale()>PhotoViewAttacher.DEFAULT_MIN_SCALE) {
         zoomButton.setTag("ZoomedIn");
-        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_angel));
+        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomin));
+      } else if (mPhotoView.getScale()>PhotoViewAttacher.DEFAULT_MIN_SCALE) {
+        zoomButton.setTag("ZoomedOut");
+        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomout));
       }
 
       //mCurrMatrixTv.setText(rect.toString());
