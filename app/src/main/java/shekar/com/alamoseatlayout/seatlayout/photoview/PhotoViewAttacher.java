@@ -32,18 +32,13 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.OverScroller;
 
-/**
- * The component of {@link PhotoView} which does the work allowing for zooming, scaling, panning, etc.
- * It is made public in case you need to subclass something other than {@link ImageView} and still
- * gain the functionality that {@link PhotoView} offers
- */
 public class PhotoViewAttacher implements View.OnTouchListener,
         OnGestureListener,
         View.OnLayoutChangeListener {
 
-    private static float DEFAULT_MAX_SCALE = 3.0f;
-    private static float DEFAULT_MID_SCALE = 1.75f;
-    private static float DEFAULT_MIN_SCALE = 1.0f;
+    public static float DEFAULT_MAX_SCALE = 3.0f;
+    public static float DEFAULT_MID_SCALE = 1.75f;
+    public static float DEFAULT_MIN_SCALE = 1.0f;
     private static int DEFAULT_ZOOM_DURATION = 200;
 
     private static final int EDGE_NONE = -1;

@@ -17,23 +17,17 @@ import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
 
 import static shekar.com.alamoseatlayout.seatlayout.MainActivity.PHOTO_TAP_TOAST_STRING;
 
-public class HallTheaterScheme {
-  Paint backgroundPaint;
-  int seatGap = 5;
-  int offsetX = 12;
-  int offsetY = 12;
-  int minSeatWidth = 30;
-  float seatWidth;
-  int bitmapHeight;
-  int bitmapWidth;
+class HallTheaterScheme {
+  private int offsetX = 12;
+  private int bitmapHeight;
+  private int bitmapWidth;
   private Context mContext;
   private Paint testPaint;
-  private Screen screen;
   private Seat[][] seats;
   private int rows;
   private int columns;
 
-  public HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
+  HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext(), seats);
     imageView.setOnPhotoTapListener(new PhotoTapListener());
     imageView.setImageBitmap(getImageBitmap(measuredWidth, measuredHeight));
@@ -64,21 +58,8 @@ public class HallTheaterScheme {
     }
   }
 
-  //public boolean canSeatPress(Point p, int row, int seat) {
-  //  if (row >= width || (p.x % (seatWidth + seatGap) >= seatWidth) || p.x <= 0) {
-  //    return false;
-  //  }
-  //  if (seat >= height || (p.y % (seatWidth + seatGap) >= seatWidth) || p.y <= 0) {
-  //    return false;
-  //  }
-  //  return SeatStatus.canSeatBePressed(seats[seat][row].status());
-  //}
-
   private void init(Context context, Seat[][] seats) {
     mContext = context;
-    backgroundPaint = new Paint();
-    backgroundPaint.setStyle(Paint.Style.FILL);
-    backgroundPaint.setColor(Color.BLACK);
     testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     testPaint.setStyle(Paint.Style.FILL);
     testPaint.setColor(Color.GREEN);
@@ -89,10 +70,14 @@ public class HallTheaterScheme {
     columns = seats[0].length;
   }
 
-  public Bitmap getImageBitmap(int measuredWidth, int measuredHeight) {
-    screen = new Screen(measuredWidth, mContext, backgroundPaint);
+  private Bitmap getImageBitmap(int measuredWidth, int measuredHeight) {
+    final Screen screen = new Screen(measuredWidth, mContext);
+    final int seatGap = 5;
     float computedSeatWidth = (measuredWidth / columns) - seatGap;
     float topOffset = screen.baseLine + (int) DensityUtil.dip2px(mContext, 8);
+    final int offsetY = 12;
+    final int minSeatWidth = 30;
+    final float seatWidth;
     if (computedSeatWidth > minSeatWidth) {
       seatWidth = minSeatWidth;
       offsetX = (int) (measuredWidth - ((seatWidth + seatGap) * columns));
@@ -102,11 +87,9 @@ public class HallTheaterScheme {
       bitmapHeight = (int) (rows * (seatWidth + seatGap) + offsetY + topOffset);
     }
     bitmapWidth = measuredWidth;
-    //int bitmapWidth = columns * (seatWidth + seatGap) - seatGap + offset;
+
     Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
-    //tempCanvas.drawPaint(backgroundPaint);
-    //drawScreen(bitmapWidth, tempCanvas);
     screen.drawScreen(tempCanvas);
 
     //Drawing Seats
@@ -127,24 +110,7 @@ public class HallTheaterScheme {
     return tempBitmap;
   }
 
-  private void drawScreen(int width, Canvas tempCanvas) {
-    //Drawing Screen
-    //float widthCenter = width / 2;
-    //float screenWidth = width * 6 / 7;
-    //float screenHeight = DensityUtil.dip2px(mContext, 10);
-    //float left = widthCenter - screenWidth / 2;
-    //float top = DensityUtil.dip2px(mContext, 24);
-    //RectF screenRect = new RectF(left, top, left + screenWidth, top + screenHeight);
-    //tempCanvas.drawRoundRect(screenRect, DensityUtil.dip2px(mContext, screenHeight), DensityUtil.dip2px(mContext, screenHeight), screenPaint);
-    //screenRect.top = top + screenHeight / 2;
-    //tempCanvas.drawRect(screenRect, backgroundPaint);
-    //float textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
-    //float textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;
-    //tempCanvas.drawText(message, screenRect.centerX() - textOffsetX, screenRect.centerY() + textOffsetY, screenTextPaint);
-    //screenOffset = screenRect.centerY() + textOffsetY;
-  }
-
-  public enum SeatStatus {
+  enum SeatStatus {
     NONE, EMPTY, SOLD, RESERVED, BROKEN, PLACEHOLDER, UNKNOWN, BUSY, CHOSEN, INFO;
 
     public static boolean canSeatBePressed(SeatStatus status) {
@@ -158,29 +124,34 @@ public class HallTheaterScheme {
     }
   }
 
-  public enum SeatStyle {
+  enum SeatStyle {
     NONE, NORMAL, BARSEAT, HANDICAP, COMPANION, UNKNOWN
   }
 
-  public enum TableStyle {
+  enum TableStyle {
     NONE, SINGLE, PAIR_LEFT, PAIR_RIGHT, SIDE_TABLE_LEFT, SIDE_TABLE_RIGHT, LONG_LEFT, LONG_CENTER, LONG_RIGHT, LONG_GAP, LONG_GAP_LEFT, LONG_GAP_RIGHT, UNKNOWN
   }
 
-  public static class Screen {
+  private class Screen {
 
-    public float screenWidth, screenHeight, left, top, cornerRadius, baseLine, textOffsetX, textOffsetY;
+    float screenWidth, screenHeight, left, top, cornerRadius, baseLine, textOffsetX, textOffsetY;
     private Paint screenPaint;
     private Paint screenTextPaint;
     private String message;
     private Paint backgroundPaint;
 
-    Screen(float totalWidth, Context context, Paint backgroundPaint) {
+    Screen(float totalWidth, Context context) {
+
       screenHeight = DensityUtil.dip2px(context, 10);
       float widthCenter = totalWidth / 2;
       screenWidth = totalWidth * 6 / 7;
       left = widthCenter - screenWidth / 2;
       top = DensityUtil.dip2px(context, 24);
       cornerRadius = DensityUtil.dip2px(context, screenHeight);
+
+      backgroundPaint = new Paint();
+      backgroundPaint.setStyle(Paint.Style.FILL);
+      backgroundPaint.setColor(Color.BLACK);
 
       screenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
       screenPaint.setStyle(Paint.Style.FILL);
@@ -197,7 +168,6 @@ public class HallTheaterScheme {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         screenTextPaint.setLetterSpacing(0.13f);
       }
-      this.backgroundPaint = backgroundPaint;
       message = "THE SCREEN";
       textOffsetX = (screenTextPaint.measureText(message) * 0.5f);
       textOffsetY = screenTextPaint.getFontMetrics().ascent * -0.8f + screenHeight;

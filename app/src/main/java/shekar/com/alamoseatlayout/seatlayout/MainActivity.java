@@ -3,6 +3,7 @@ package shekar.com.alamoseatlayout.seatlayout;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import shekar.com.alamoseatlayout.R;
 import shekar.com.alamoseatlayout.seatlayout.photoview.OnMatrixChangedListener;
 import shekar.com.alamoseatlayout.seatlayout.photoview.OnSingleFlingListener;
 import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
+import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoViewAttacher;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,24 +34,35 @@ public class MainActivity extends AppCompatActivity {
   private Toast mCurrentToast;
 
   private Matrix mCurrentDisplayMatrix = null;
-
+  private ImageButton zoomButton;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-
+    zoomButton = (ImageButton) findViewById(R.id.zoom_view);
+    zoomButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        if (zoomButton.getTag().equals("ZoomedOut")) {
+          mPhotoView.setScale(PhotoViewAttacher.DEFAULT_MID_SCALE, true);
+          zoomButton.setTag("ZoomedIn");
+          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_angel));
+        } else if (zoomButton.getTag().equals("ZoomedIn")) {
+          mPhotoView.setScale(PhotoViewAttacher.DEFAULT_MIN_SCALE, true);
+          zoomButton.setTag("ZoomedOut");
+          zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_cool));
+        }
+      }
+    });
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     toolbar.setTitle("Simple Sample");
     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
+      @Override public void onClick(View v) {
         onBackPressed();
       }
     });
     toolbar.inflateMenu(R.menu.main_menu);
     toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-      @Override
-      public boolean onMenuItemClick(MenuItem item) {
+      @Override public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
           case R.id.menu_zoom_toggle:
             mPhotoView.setZoomable(!mPhotoView.isZoomEnabled());
@@ -96,10 +110,11 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
           case R.id.menu_matrix_restore:
-            if (mCurrentDisplayMatrix == null)
+            if (mCurrentDisplayMatrix == null) {
               showToast("You need to capture display matrix first");
-            else
+            } else {
               mPhotoView.setDisplayMatrix(mCurrentDisplayMatrix);
+            }
             return true;
           case R.id.menu_matrix_capture:
             mCurrentDisplayMatrix = new Matrix();
@@ -118,17 +133,18 @@ public class MainActivity extends AppCompatActivity {
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
         mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
-        new HallTheaterScheme(basicScheme(),mPhotoView,mPhotoView.getMeasuredWidth(),mPhotoView.getMeasuredHeight());
+        new HallTheaterScheme(basicScheme(), mPhotoView, mPhotoView.getMeasuredWidth(), mPhotoView.getMeasuredHeight());
         return true;
       }
     });
-   // mCurrMatrixTv = (TextView) findViewById(R.id.tv_current_matrix);
+    // mCurrMatrixTv = (TextView) findViewById(R.id.tv_current_matrix);
 
     // Lets attach some listeners, not required though!
     mPhotoView.setOnMatrixChangeListener(new MatrixChangeListener());
 
     mPhotoView.setOnSingleFlingListener(new SingleFlingListener());
   }
+
 
   private void showToast(CharSequence text) {
     if (mCurrentToast != null) {
@@ -139,37 +155,43 @@ public class MainActivity extends AppCompatActivity {
     mCurrentToast.show();
   }
 
+  public Seat[][] basicScheme() {
+    int rows = 12;
+    int columns = 12;
+    Seat seats[][] = new Seat[rows][columns];
+    for (int i = 0; i < rows; i++)
+      for (int j = 0; j < columns; j++) {
+        SeatExample seat = new SeatExample();
+        seat.id = i * rows + (j + 1);
+        seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
+        seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
+        seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
+        seat.selectedSeatMarker = String.valueOf(j + 1);
+        seats[i][j] = seat;
+      }
+    return seats;
+  }
+
   private class MatrixChangeListener implements OnMatrixChangedListener {
 
-    @Override
-    public void onMatrixChanged(RectF rect) {
+    @Override public void onMatrixChanged(RectF rect) {
+      if (mPhotoView.getScale()==PhotoViewAttacher.DEFAULT_MIN_SCALE) {
+        zoomButton.setTag("ZoomedOut");
+        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_cool));
+      } else if (mPhotoView.getScale()>PhotoViewAttacher.DEFAULT_MIN_SCALE) {
+        zoomButton.setTag("ZoomedIn");
+        zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.emo_im_angel));
+      }
+
       //mCurrMatrixTv.setText(rect.toString());
     }
   }
 
   private class SingleFlingListener implements OnSingleFlingListener {
 
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    @Override public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
       Log.d("PhotoView", String.format(FLING_LOG_STRING, velocityX, velocityY));
       return true;
     }
-  }
-
-  public Seat[][] basicScheme() {
-    int rows=2;
-    int columns=2;
-    Seat seats[][] = new Seat[rows][columns];
-    for (int i = 0; i < rows; i++)
-      for(int j = 0; j < columns; j++) {
-        SeatExample seat = new SeatExample();
-        seat.id = i * rows + (j + 1);
-        seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
-        seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
-        seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
-        seat.selectedSeatMarker = String.valueOf(j+1);
-        seats[i][j] = seat;
-      }
-    return seats;
   }
 }
