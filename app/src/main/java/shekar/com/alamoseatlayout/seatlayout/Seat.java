@@ -10,9 +10,9 @@ public interface Seat {
   String selectedSeat();
   HallTheaterScheme.SeatStatus status();
   void setSeatStatus(HallTheaterScheme.SeatStatus seatStatus);
-  HallTheaterScheme.SeatStyle seatStyle();
+  HallTheaterScheme.SeatStyle getSeatStyle();
   void setSeatStyle(HallTheaterScheme.SeatStyle status);
-  HallTheaterScheme.TableStyle tableStyle();
+  HallTheaterScheme.TableStyle getTableStyle();
   void setTableStyle(HallTheaterScheme.TableStyle status);
   boolean canSeatPress(float x, float y);
 }

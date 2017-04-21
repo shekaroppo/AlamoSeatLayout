@@ -33,14 +33,6 @@ public class SeatExample implements Seat {
     return selectedSeatMarker;
   }
 
-  @Override public HallTheaterScheme.SeatStatus status() {
-    return seatStatus;
-  }
-
-  public void setSeatStatus(HallTheaterScheme.SeatStatus seatStatus) {
-    this.seatStatus = seatStatus;
-  }
-
   @Override public int areaIndex() {
     return areaIndex;
   }
@@ -53,15 +45,23 @@ public class SeatExample implements Seat {
     return columnIndex;
   }
 
-  @Override public HallTheaterScheme.SeatStyle seatStyle() {
+  @Override public HallTheaterScheme.SeatStyle getSeatStyle() {
     return seatStyles;
   }
 
- public void setSeatStyle(HallTheaterScheme.SeatStyle seatStyle) {
+  public void setSeatStyle(HallTheaterScheme.SeatStyle seatStyle) {
     this.seatStyles = seatStyle;
   }
 
-  @Override public HallTheaterScheme.TableStyle tableStyle() {
+  @Override public HallTheaterScheme.SeatStatus status() {
+    return seatStatus;
+  }
+
+  public void setSeatStatus(HallTheaterScheme.SeatStatus seatStatus) {
+    this.seatStatus = seatStatus;
+  }
+
+  @Override public HallTheaterScheme.TableStyle getTableStyle() {
     return tableStyle;
   }
 

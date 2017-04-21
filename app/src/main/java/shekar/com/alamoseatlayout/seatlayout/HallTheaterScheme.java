@@ -8,9 +8,11 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.widget.ImageView;
 import android.widget.Toast;
+import shekar.com.alamoseatlayout.R;
 import shekar.com.alamoseatlayout.drawing.DensityUtil;
 import shekar.com.alamoseatlayout.seatlayout.photoview.OnPhotoTapListener;
 import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
@@ -22,30 +24,19 @@ class HallTheaterScheme {
   private int bitmapHeight;
   private int bitmapWidth;
   private Context mContext;
-  private Paint testPaint;
+  private Paint seatPaint;
   private Seat[][] seats;
   private int rows;
   private int columns;
+  private int  tablePaintStrokeWidth;
+  private Paint rectPaint;
+  private Paint tablePaintWithRoundButt;
+  private Paint tablePaintWithRoundCap;
 
   HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext(), seats);
     imageView.setOnPhotoTapListener(new PhotoTapListener());
     imageView.setImageBitmap(getImageBitmap(measuredWidth, measuredHeight));
-  }
-
-  public static Bitmap scaleBitmap(Bitmap src, float factor) {
-    int width = src.getWidth();
-    int height = src.getHeight();
-    int scaledWidth = (int) (width * factor);
-    int scaledHeight = (int) (height * factor);
-    Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-    Bitmap scaled = Bitmap.createScaledBitmap(src, scaledWidth, scaledHeight, false);
-    Canvas canvas = new Canvas(bmp);
-    Paint paint = new Paint();
-    int distX = (width - scaledWidth) / 2;
-    int distY = (height - scaledHeight) / 2;
-    canvas.drawBitmap(scaled, distX, distY, paint);
-    return bmp;
   }
 
   private void clickScheme(float xPos, float yPos) {
@@ -60,11 +51,37 @@ class HallTheaterScheme {
 
   private void init(Context context, Seat[][] seats) {
     mContext = context;
-    testPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    testPaint.setStyle(Paint.Style.FILL);
-    testPaint.setColor(Color.GREEN);
-    testPaint.setFilterBitmap(true);
-    testPaint.setDither(true);
+    tablePaintStrokeWidth=Math.round(DensityUtil.dip2px(mContext, 4));
+    tablePaintWithRoundCap = new Paint(Paint.ANTI_ALIAS_FLAG);
+    //tablePaintWithRoundCap.setColor(Color.GREEN);
+    tablePaintWithRoundCap.setColor(ContextCompat.getColor(mContext, R.color.table_color));
+    tablePaintWithRoundCap.setFilterBitmap(true);
+    tablePaintWithRoundCap.setDither(true);
+    tablePaintWithRoundCap.setStyle(Paint.Style.FILL); // set to STOKE
+    tablePaintWithRoundCap.setStrokeCap(Paint.Cap.ROUND);  // set the paint cap to round too
+
+    tablePaintWithRoundButt = new Paint(Paint.ANTI_ALIAS_FLAG);
+    //tablePaintWithRoundButt.setColor(Color.BLUE);
+    tablePaintWithRoundButt.setColor(ContextCompat.getColor(mContext, R.color.table_color));
+    tablePaintWithRoundButt.setFilterBitmap(true);
+    tablePaintWithRoundButt.setDither(true);
+    tablePaintWithRoundButt.setStyle(Paint.Style.FILL); // set to STOKE
+    tablePaintWithRoundButt.setStrokeCap(Paint.Cap.BUTT);  // set the paint cap to round too
+
+    seatPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    seatPaint.setStyle(Paint.Style.FILL);
+    //seatPaint.setColor(Color.RED);
+    seatPaint.setColor(Color.WHITE);
+    seatPaint.setFilterBitmap(true);
+    seatPaint.setDither(true);
+
+    rectPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    rectPaint.setStyle(Paint.Style.FILL);
+    //rectPaint.setColor(Color.WHITE);
+    rectPaint.setColor(Color.TRANSPARENT);
+    rectPaint.setFilterBitmap(true);
+    rectPaint.setDither(true);
+
     this.seats = seats;
     rows = seats.length;
     columns = seats[0].length;
@@ -72,42 +89,99 @@ class HallTheaterScheme {
 
   private Bitmap getImageBitmap(int measuredWidth, int measuredHeight) {
     final Screen screen = new Screen(measuredWidth, mContext);
-    final int seatGap = 5;
+    final int seatGap = 0;
     float computedSeatWidth = (measuredWidth / columns) - seatGap;
     float topOffset = screen.baseLine + (int) DensityUtil.dip2px(mContext, 8);
     final int offsetY = 12;
-    final int minSeatWidth = 30;
+    final float minSeatWidth = DensityUtil.dip2px(mContext, 30);
     final float seatWidth;
+    final float seatHeight;
+    //final float tableSeatGap=DensityUtil.dip2px(mContext, 1);
     if (computedSeatWidth > minSeatWidth) {
       seatWidth = minSeatWidth;
+      seatHeight= seatWidth+tablePaintStrokeWidth;
       offsetX = (int) (measuredWidth - ((seatWidth + seatGap) * columns));
       bitmapHeight = (int) (measuredHeight + screen.baseLine);
     } else {
       seatWidth = computedSeatWidth;
-      bitmapHeight = (int) (rows * (seatWidth + seatGap) + offsetY + topOffset);
+      seatHeight= seatWidth+tablePaintStrokeWidth;
+      bitmapHeight = (int) (rows * (seatHeight + seatGap) + offsetY + topOffset);
     }
     bitmapWidth = measuredWidth;
-
+    tablePaintStrokeWidth= (int) Math.round(seatWidth * 0.2);
+    tablePaintWithRoundCap.setStrokeWidth(tablePaintStrokeWidth);
+    tablePaintWithRoundButt.setStrokeWidth(tablePaintStrokeWidth);
     Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
     Canvas tempCanvas = new Canvas(tempBitmap);
     screen.drawScreen(tempCanvas);
 
     //Drawing Seats
+    drawingSeats(seatGap, topOffset, offsetY, seatWidth,seatHeight, tempCanvas);
+    return tempBitmap;
+  }
+
+  private void drawingSeats(int seatGap, float topOffset, int offsetY, float seatWidth,float seatHeight, Canvas tempCanvas) {
+    final float seatPadding=DensityUtil.dip2px(mContext, 6);
     float left, right, top, bottom;
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
         left = offsetX / 2 + (seatWidth + seatGap) * column;
         right = left + seatWidth;
-        top = offsetY / 2 + (seatWidth + seatGap) * row + topOffset;
-        bottom = top + seatWidth;
-        System.out.println(
-            String.format("======R %d | C %d = Left: %f , Right %f, Top %f , Bottom %f ", row, column, left, right, top, bottom) + "======");
+        top = offsetY / 2 + (seatHeight + seatGap) * row + topOffset;
+        bottom = top + seatHeight;
         SeatExample seat = ((SeatExample) seats[row][column]);
         seat.bounds = new RectF(left, top, right, bottom);
-        tempCanvas.drawRect(seat.bounds, testPaint);
+        tempCanvas.drawRect(seat.bounds, rectPaint);
+        tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2,seat.bounds.width()/2-seatPadding, seatPaint);
+        drawTable(tempCanvas, seat);
+        //System.out.println(
+        //    String.format("======R %d | C %d = Left: %f , Right %f, Top %f , Bottom %f ", row, column, left, right, top, bottom) + "======");
+
       }
     }
-    return tempBitmap;
+  }
+
+  private void drawTable(Canvas tempCanvas, SeatExample seat) {
+    if(seat.getTableStyle()==TableStyle.NONE ||seat.getTableStyle()==TableStyle.LONG_GAP||seat.getTableStyle()==TableStyle.UNKNOWN ){
+      return;
+    }else  if(seat.getTableStyle()==TableStyle.SINGLE){
+      tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,
+          tablePaintWithRoundCap);
+    }
+    else  if(seat.getTableStyle()==TableStyle.PAIR_LEFT){
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+    }
+    else  if(seat.getTableStyle()==TableStyle.PAIR_RIGHT){
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    }
+    else  if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT){
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    }
+    else  if(seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT){
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    }
+    else  if(seat.getTableStyle()==TableStyle.LONG_LEFT){
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+    }
+    else  if(seat.getTableStyle()==TableStyle.LONG_CENTER){
+      drawTableRect(tempCanvas, seat,0,0);
+    }
+    else  if(seat.getTableStyle()==TableStyle.LONG_RIGHT){
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    }
+    else  if(seat.getTableStyle()==TableStyle.LONG_GAP_LEFT){
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    }
+    else  if(seat.getTableStyle()==TableStyle.LONG_GAP_RIGHT){
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+    }
+  }
+
+  private void drawTableRect(Canvas tempCanvas, SeatExample seat, int roundedRectLeft, int roundedRectRight) {
+    tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,
+        tablePaintWithRoundCap);
+    tempCanvas.drawLine(seat.bounds.left+roundedRectLeft,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-roundedRectRight,seat.bounds.top+tablePaintStrokeWidth/2,
+        tablePaintWithRoundButt);
   }
 
   enum SeatStatus {

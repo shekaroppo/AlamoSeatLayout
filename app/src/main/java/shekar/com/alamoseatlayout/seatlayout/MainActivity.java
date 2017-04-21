@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    int rows = 12;
-    int columns = 12;
+    int rows = 10;
+    int columns = 15;
     Seat seats[][] = new Seat[rows][columns];
     for (int i = 0; i < rows; i++)
       for (int j = 0; j < columns; j++) {
@@ -165,7 +165,46 @@ public class MainActivity extends AppCompatActivity {
         seat.id = i * rows + (j + 1);
         seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
         seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
-        seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
+        if(j==0) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.NONE;
+        }
+        else if(j==1) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
+        }
+        else if(j==2) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.PAIR_LEFT;
+        }
+        else if(j==3) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.PAIR_RIGHT;
+        }
+        else if(j==4) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.SIDE_TABLE_LEFT;
+        }
+        else if(j==5) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.SIDE_TABLE_RIGHT;
+        }
+        else if(j==6) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_LEFT;
+        }
+        else if(j==7) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_CENTER;
+        }
+        else if(j==8) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_RIGHT;
+        }
+        else if(j==9) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP;
+        }
+        else if(j==10) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP_LEFT;
+        }
+        else if(j==11) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP_RIGHT;
+        }
+        else if(j==12) {
+          seat.tableStyle = HallTheaterScheme.TableStyle.UNKNOWN;
+        }
+
         seat.selectedSeatMarker = String.valueOf(j + 1);
         seats[i][j] = seat;
       }
@@ -182,8 +221,6 @@ public class MainActivity extends AppCompatActivity {
         zoomButton.setTag("ZoomedOut");
         zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomout));
       }
-
-      //mCurrMatrixTv.setText(rect.toString());
     }
   }
 
