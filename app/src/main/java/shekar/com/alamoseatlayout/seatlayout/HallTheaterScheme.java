@@ -2,6 +2,7 @@ package shekar.com.alamoseatlayout.seatlayout;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,6 +34,8 @@ class HallTheaterScheme {
   private Paint tablePaintWithRoundButt;
   private Paint tablePaintWithRoundCap;
   private float seatBottomPadding;
+  private Bitmap accessibleBitmap;
+  private Bitmap companionBitmap;
 
   HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext(), seats);
@@ -52,6 +55,10 @@ class HallTheaterScheme {
 
   private void init(Context context, Seat[][] seats) {
     mContext = context;
+    accessibleBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.accessible);
+    companionBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.companion);
+   int bitwampw=accessibleBitmap.getWidth()/2;
+    int b=accessibleBitmap.getHeight()/2;
     tablePaintWithRoundCap = new Paint(Paint.ANTI_ALIAS_FLAG);
     //tablePaintWithRoundCap.setColor(Color.GREEN);
     tablePaintWithRoundCap.setColor(ContextCompat.getColor(mContext, R.color.table_color));
@@ -61,7 +68,7 @@ class HallTheaterScheme {
     tablePaintWithRoundCap.setStrokeCap(Paint.Cap.ROUND);  // set the paint cap to round too
 
     tablePaintWithRoundButt = new Paint(Paint.ANTI_ALIAS_FLAG);
-   // tablePaintWithRoundButt.setColor(Color.RED);
+    //tablePaintWithRoundButt.setColor(Color.RED);
     tablePaintWithRoundButt.setColor(ContextCompat.getColor(mContext, R.color.table_color));
     tablePaintWithRoundButt.setFilterBitmap(true);
     tablePaintWithRoundButt.setDither(true);
@@ -142,10 +149,21 @@ class HallTheaterScheme {
   }
 
   private void drawSeat(Canvas tempCanvas, SeatExample seat) {
-    if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT||seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT){
+    if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT||seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT || seat.getSeatStyle()==SeatStyle.NONE|| seat.getSeatStyle()==SeatStyle.UNKNOWN){
       return;
     }
-    tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding,seat.bounds.width()/4, seatPaint);
+    else if(seat.getSeatStyle()==SeatStyle.NORMAL){
+      tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding,seat.bounds.width()/4, seatPaint);
+    }
+    else if(seat.getSeatStyle()==SeatStyle.BARSEAT){
+      tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding,seat.bounds.width()/4, seatPaint);
+    }
+    else if(seat.getSeatStyle()==SeatStyle.HANDICAP){
+      tempCanvas.drawBitmap(accessibleBitmap,seat.bounds.centerX()-accessibleBitmap.getWidth()/2,seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding-accessibleBitmap.getHeight()/2, seatPaint);
+    }
+    else if(seat.getSeatStyle()==SeatStyle.COMPANION){
+      tempCanvas.drawBitmap(companionBitmap,seat.bounds.centerX()-companionBitmap.getWidth()/2,seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding-companionBitmap.getHeight()/2, seatPaint);
+    }
   }
 
   private void drawTable(Canvas tempCanvas, SeatExample seat) {
@@ -260,67 +278,6 @@ class HallTheaterScheme {
       canvas.drawRect(screenRect, backgroundPaint);
       canvas.drawText(message, screenRect.centerX() - textOffsetX, baseLine, screenTextPaint);
     }
-    //
-    //public void setScenePosition(ScenePosition position, int offset) {
-    //  this.position = position;
-    //  this.offset = offset;
-    //  dimension = 90;
-    //  switch (position) {
-    //    case NORTH:
-    //      dimensionSecond = width * 12;
-    //      break;
-    //    case SOUTH:
-    //      dimensionSecond = width * 12;
-    //      break;
-    //    case EAST:
-    //      dimensionSecond = height * 12;
-    //      break;
-    //    case WEST:
-    //      dimensionSecond = height * 12;
-    //      break;
-    //    case NONE:
-    //      dimensionSecond = 0;
-    //      dimension = 0;
-    //      break;
-    //    default:
-    //      dimensionSecond = 0;
-    //      dimension = 0;
-    //      this.position = ScenePosition.NONE;
-    //      break;
-    //  }
-    //}
-
-    //public int getTopXOffset() {
-    //  if (position == ScenePosition.NORTH) {
-    //    return dimension + offset;
-    //  }
-    //  return 0;
-    //}
-    //
-    //public int getLeftYOffset() {
-    //  if (position == ScenePosition.EAST) {
-    //    return dimension + offset;
-    //  }
-    //  return 0;
-    //}
-    //
-    //public int getBottomXOffset() {
-    //  if (position == ScenePosition.SOUTH) {
-    //    return dimension + offset;
-    //  }
-    //  return 0;
-    //}
-    //
-    //public int getRightYOffset() {
-    //  if (position == ScenePosition.WEST) {
-    //    return dimension + offset;
-    //  }
-    //  return 0;
-    //}
-
-    //@Override public String toString() {
-    //  return String.format("Left - %d, Right- %d, Top - %d, Bottom - %d", getLeftYOffset(), getRightYOffset(), getTopXOffset(), getBottomXOffset());
-    //}
   }
 
   private class PhotoTapListener implements OnPhotoTapListener {

@@ -164,7 +164,25 @@ public class MainActivity extends AppCompatActivity {
         SeatExample seat = new SeatExample();
         seat.id = i * rows + (j + 1);
         seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
-        seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
+
+        if(j==0){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.NONE;
+        }
+        else if(j==1){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
+        }
+        else if(j==2){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.BARSEAT;
+        }
+        else if(j==3){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.HANDICAP;
+        }
+        else if(j==4){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.COMPANION;
+        }else if(j==5){
+          seat.seatStyles = HallTheaterScheme.SeatStyle.UNKNOWN;
+        }
+
         if(j==0) {
           seat.tableStyle = HallTheaterScheme.TableStyle.NONE;
         }
