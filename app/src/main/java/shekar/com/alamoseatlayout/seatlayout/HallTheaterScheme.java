@@ -32,6 +32,7 @@ class HallTheaterScheme {
   private Paint rectPaint;
   private Paint tablePaintWithRoundButt;
   private Paint tablePaintWithRoundCap;
+  private float seatBottomPadding;
 
   HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext(), seats);
@@ -51,7 +52,6 @@ class HallTheaterScheme {
 
   private void init(Context context, Seat[][] seats) {
     mContext = context;
-    tablePaintStrokeWidth=Math.round(DensityUtil.dip2px(mContext, 4));
     tablePaintWithRoundCap = new Paint(Paint.ANTI_ALIAS_FLAG);
     //tablePaintWithRoundCap.setColor(Color.GREEN);
     tablePaintWithRoundCap.setColor(ContextCompat.getColor(mContext, R.color.table_color));
@@ -61,7 +61,7 @@ class HallTheaterScheme {
     tablePaintWithRoundCap.setStrokeCap(Paint.Cap.ROUND);  // set the paint cap to round too
 
     tablePaintWithRoundButt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    //tablePaintWithRoundButt.setColor(Color.BLUE);
+   // tablePaintWithRoundButt.setColor(Color.RED);
     tablePaintWithRoundButt.setColor(ContextCompat.getColor(mContext, R.color.table_color));
     tablePaintWithRoundButt.setFilterBitmap(true);
     tablePaintWithRoundButt.setDither(true);
@@ -96,19 +96,20 @@ class HallTheaterScheme {
     final float minSeatWidth = DensityUtil.dip2px(mContext, 30);
     final float seatWidth;
     final float seatHeight;
-    //final float tableSeatGap=DensityUtil.dip2px(mContext, 1);
+    final float tableSeatPadding=DensityUtil.dip2px(mContext, 2);
+    seatBottomPadding=DensityUtil.dip2px(mContext, 8);
     if (computedSeatWidth > minSeatWidth) {
       seatWidth = minSeatWidth;
-      seatHeight= seatWidth+tablePaintStrokeWidth;
+      seatHeight= seatWidth+tablePaintStrokeWidth+tableSeatPadding+seatBottomPadding;
       offsetX = (int) (measuredWidth - ((seatWidth + seatGap) * columns));
       bitmapHeight = (int) (measuredHeight + screen.baseLine);
     } else {
       seatWidth = computedSeatWidth;
-      seatHeight= seatWidth+tablePaintStrokeWidth;
+      seatHeight= seatWidth+tablePaintStrokeWidth+tableSeatPadding+seatBottomPadding;
       bitmapHeight = (int) (rows * (seatHeight + seatGap) + offsetY + topOffset);
     }
     bitmapWidth = measuredWidth;
-    tablePaintStrokeWidth= (int) Math.round(seatWidth * 0.2);
+    tablePaintStrokeWidth= (int) Math.round(seatWidth * 0.15);
     tablePaintWithRoundCap.setStrokeWidth(tablePaintStrokeWidth);
     tablePaintWithRoundButt.setStrokeWidth(tablePaintStrokeWidth);
     Bitmap tempBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
@@ -121,7 +122,6 @@ class HallTheaterScheme {
   }
 
   private void drawingSeats(int seatGap, float topOffset, int offsetY, float seatWidth,float seatHeight, Canvas tempCanvas) {
-    final float seatPadding=DensityUtil.dip2px(mContext, 6);
     float left, right, top, bottom;
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
@@ -132,7 +132,7 @@ class HallTheaterScheme {
         SeatExample seat = ((SeatExample) seats[row][column]);
         seat.bounds = new RectF(left, top, right, bottom);
         tempCanvas.drawRect(seat.bounds, rectPaint);
-        tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2,seat.bounds.width()/2-seatPadding, seatPaint);
+        drawSeat(tempCanvas, seat);
         drawTable(tempCanvas, seat);
         //System.out.println(
         //    String.format("======R %d | C %d = Left: %f , Right %f, Top %f , Bottom %f ", row, column, left, right, top, bottom) + "======");
@@ -141,44 +141,49 @@ class HallTheaterScheme {
     }
   }
 
+  private void drawSeat(Canvas tempCanvas, SeatExample seat) {
+    if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT||seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT){
+      return;
+    }
+    tempCanvas.drawCircle(seat.bounds.centerX(),seat.bounds.bottom-seat.bounds.width()/2-seatBottomPadding,seat.bounds.width()/4, seatPaint);
+  }
+
   private void drawTable(Canvas tempCanvas, SeatExample seat) {
     if(seat.getTableStyle()==TableStyle.NONE ||seat.getTableStyle()==TableStyle.LONG_GAP||seat.getTableStyle()==TableStyle.UNKNOWN ){
       return;
     }else  if(seat.getTableStyle()==TableStyle.SINGLE){
-      tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,
+      tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth,seat.bounds.top+tablePaintStrokeWidth/2,
           tablePaintWithRoundCap);
     }
     else  if(seat.getTableStyle()==TableStyle.PAIR_LEFT){
-      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth,0);
     }
     else  if(seat.getTableStyle()==TableStyle.PAIR_RIGHT){
-      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth);
     }
-    else  if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT){
-      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
-    }
-    else  if(seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT){
-      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+    else  if(seat.getTableStyle()==TableStyle.SIDE_TABLE_LEFT||seat.getTableStyle()==TableStyle.SIDE_TABLE_RIGHT){
+      tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth,seat.bounds.bottom-tablePaintStrokeWidth-seatBottomPadding,seat.bounds.right-tablePaintStrokeWidth,seat.bounds.bottom-tablePaintStrokeWidth-seatBottomPadding,
+          tablePaintWithRoundButt);
     }
     else  if(seat.getTableStyle()==TableStyle.LONG_LEFT){
-      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth,0);
     }
     else  if(seat.getTableStyle()==TableStyle.LONG_CENTER){
       drawTableRect(tempCanvas, seat,0,0);
     }
     else  if(seat.getTableStyle()==TableStyle.LONG_RIGHT){
-      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth);
     }
     else  if(seat.getTableStyle()==TableStyle.LONG_GAP_LEFT){
-      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth/2);
+      drawTableRect(tempCanvas, seat,0,tablePaintStrokeWidth);
     }
     else  if(seat.getTableStyle()==TableStyle.LONG_GAP_RIGHT){
-      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth/2,0);
+      drawTableRect(tempCanvas, seat,tablePaintStrokeWidth,0);
     }
   }
 
   private void drawTableRect(Canvas tempCanvas, SeatExample seat, int roundedRectLeft, int roundedRectRight) {
-    tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth/2,seat.bounds.top+tablePaintStrokeWidth/2,
+    tempCanvas.drawLine(seat.bounds.left+tablePaintStrokeWidth,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-tablePaintStrokeWidth,seat.bounds.top+tablePaintStrokeWidth/2,
         tablePaintWithRoundCap);
     tempCanvas.drawLine(seat.bounds.left+roundedRectLeft,seat.bounds.top+tablePaintStrokeWidth/2,seat.bounds.right-roundedRectRight,seat.bounds.top+tablePaintStrokeWidth/2,
         tablePaintWithRoundButt);

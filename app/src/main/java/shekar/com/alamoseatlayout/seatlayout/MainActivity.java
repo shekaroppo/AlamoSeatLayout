@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public Seat[][] basicScheme() {
-    int rows = 10;
-    int columns = 15;
+    int rows = 12;
+    int columns = 13;
     Seat seats[][] = new Seat[rows][columns];
     for (int i = 0; i < rows; i++)
       for (int j = 0; j < columns; j++) {
