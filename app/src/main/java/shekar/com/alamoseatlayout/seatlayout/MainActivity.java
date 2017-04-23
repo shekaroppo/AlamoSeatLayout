@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
           case R.id.menu_matrix_capture:
             mCurrentDisplayMatrix = new Matrix();
-            mPhotoView.getDisplayMatrix(mCurrentDisplayMatrix);
+            mCurrentDisplayMatrix=mPhotoView.getImageMatrix();
             return true;
         }
         return false;
@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
     //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
     //  mPhotoView.setLayerType(LAYER_TYPE_SOFTWARE, null);
     //}
-    mPhotoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     ViewTreeObserver vto = mPhotoView.getViewTreeObserver();
     vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
       public boolean onPreDraw() {
@@ -144,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
 
     mPhotoView.setOnSingleFlingListener(new SingleFlingListener());
   }
-
 
   private void showToast(CharSequence text) {
     if (mCurrentToast != null) {
@@ -164,65 +162,46 @@ public class MainActivity extends AppCompatActivity {
         SeatExample seat = new SeatExample();
         seat.id = i * rows + (j + 1);
         seat.seatStatus = HallTheaterScheme.SeatStatus.EMPTY;
-
-        if(j==0){
+        if (j == 12) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.NONE;
-        }
-        else if(j==1){
+        } else if (j == 1) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.NORMAL;
-        }
-        else if(j==2){
+        } else if (j == 2) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.BARSEAT;
-        }
-        else if(j==3){
+        } else if (j == 3) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.HANDICAP;
-        }
-        else if(j==4){
+        } else if (j == 4) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.COMPANION;
-        }else if(j==5){
+        } else if (j == 5) {
           seat.seatStyles = HallTheaterScheme.SeatStyle.UNKNOWN;
         }
-
-        if(j==0) {
+        if (j == 0) {
           seat.tableStyle = HallTheaterScheme.TableStyle.NONE;
-        }
-        else if(j==1) {
+        } else if (j == 1) {
           seat.tableStyle = HallTheaterScheme.TableStyle.SINGLE;
-        }
-        else if(j==2) {
+        } else if (j == 2) {
           seat.tableStyle = HallTheaterScheme.TableStyle.PAIR_LEFT;
-        }
-        else if(j==3) {
+        } else if (j == 3) {
           seat.tableStyle = HallTheaterScheme.TableStyle.PAIR_RIGHT;
-        }
-        else if(j==4) {
+        } else if (j == 4) {
           seat.tableStyle = HallTheaterScheme.TableStyle.SIDE_TABLE_LEFT;
-        }
-        else if(j==5) {
+        } else if (j == 5) {
           seat.tableStyle = HallTheaterScheme.TableStyle.SIDE_TABLE_RIGHT;
-        }
-        else if(j==6) {
+        } else if (j == 6) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_LEFT;
-        }
-        else if(j==7) {
+        } else if (j == 7) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_CENTER;
-        }
-        else if(j==8) {
+        } else if (j == 8) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_RIGHT;
-        }
-        else if(j==9) {
+        } else if (j == 9) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP;
-        }
-        else if(j==10) {
+        } else if (j == 10) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP_LEFT;
-        }
-        else if(j==11) {
+        } else if (j == 11) {
           seat.tableStyle = HallTheaterScheme.TableStyle.LONG_GAP_RIGHT;
-        }
-        else if(j==12) {
+        } else if (j == 12) {
           seat.tableStyle = HallTheaterScheme.TableStyle.UNKNOWN;
         }
-
         seat.selectedSeatMarker = String.valueOf(j + 1);
         seats[i][j] = seat;
       }
@@ -232,10 +211,10 @@ public class MainActivity extends AppCompatActivity {
   private class MatrixChangeListener implements OnMatrixChangedListener {
 
     @Override public void onMatrixChanged(RectF rect) {
-      if (mPhotoView.getScale()==PhotoViewAttacher.DEFAULT_MIN_SCALE) {
+      if (mPhotoView.getScale() == PhotoViewAttacher.DEFAULT_MIN_SCALE) {
         zoomButton.setTag("ZoomedIn");
         zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomin));
-      } else if (mPhotoView.getScale()>PhotoViewAttacher.DEFAULT_MIN_SCALE) {
+      } else if (mPhotoView.getScale() > PhotoViewAttacher.DEFAULT_MIN_SCALE) {
         zoomButton.setTag("ZoomedOut");
         zoomButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.zoomout));
       }

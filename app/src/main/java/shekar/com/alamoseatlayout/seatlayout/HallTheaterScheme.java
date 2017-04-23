@@ -21,6 +21,7 @@ import shekar.com.alamoseatlayout.seatlayout.photoview.PhotoView;
 import static shekar.com.alamoseatlayout.seatlayout.MainActivity.PHOTO_TAP_TOAST_STRING;
 
 class HallTheaterScheme {
+  private final PhotoView photoView;
   private int offsetX = 12;
   private int bitmapHeight;
   private int bitmapWidth;
@@ -36,11 +37,17 @@ class HallTheaterScheme {
   private float seatBottomPadding;
   private Bitmap accessibleBitmap;
   private Bitmap companionBitmap;
+  private int measuredWidth;
+  private int measuredHeight;
 
   HallTheaterScheme(Seat[][] seats, PhotoView imageView, int measuredWidth, int measuredHeight) {
     init(imageView.getContext(), seats);
+    photoView=imageView;
+    this.measuredWidth=measuredWidth;
+    this.measuredHeight=measuredHeight;
     imageView.setOnPhotoTapListener(new PhotoTapListener());
-    imageView.setImageBitmap(getImageBitmap(measuredWidth, measuredHeight));
+
+    imageView.setImageBitmap(getImageBitmap());
   }
 
   private void clickScheme(float xPos, float yPos) {
@@ -48,6 +55,7 @@ class HallTheaterScheme {
       for (int column = 0; column < columns; column++) {
         if (seats[row][column].canSeatPress(xPos, yPos)) {
           Toast.makeText(mContext,seats[row][column].id()+" Clicked",Toast.LENGTH_LONG).show();
+          photoView.setImageBitmap(getImageBitmap());
         }
       }
     }
@@ -57,8 +65,6 @@ class HallTheaterScheme {
     mContext = context;
     accessibleBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.accessible);
     companionBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.companion);
-   int bitwampw=accessibleBitmap.getWidth()/2;
-    int b=accessibleBitmap.getHeight()/2;
     tablePaintWithRoundCap = new Paint(Paint.ANTI_ALIAS_FLAG);
     //tablePaintWithRoundCap.setColor(Color.GREEN);
     tablePaintWithRoundCap.setColor(ContextCompat.getColor(mContext, R.color.table_color));
@@ -92,9 +98,10 @@ class HallTheaterScheme {
     this.seats = seats;
     rows = seats.length;
     columns = seats[0].length;
+
   }
 
-  private Bitmap getImageBitmap(int measuredWidth, int measuredHeight) {
+  private Bitmap getImageBitmap() {
     final Screen screen = new Screen(measuredWidth, mContext);
     final int seatGap = 0;
     float computedSeatWidth = (measuredWidth / columns) - seatGap;

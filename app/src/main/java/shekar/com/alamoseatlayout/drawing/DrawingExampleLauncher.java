@@ -19,7 +19,7 @@ public class DrawingExampleLauncher extends Activity {
      */
     public void launchDrawShapes1(View clickedButton) {
         Intent activityIntent = 
-                new Intent(this, DrawShapes1.class);
+                new Intent(this, TableShape.class);
         startActivity(activityIntent);
     }
     
